@@ -196,11 +196,11 @@ appengine_war = rule(
             single_file = True,
         ),
         "_runner_template": attr.label(
-            default = Label("@bazel_tools//tools/build_rules/appengine:runner_template"),
+            default = Label("//appengine:runner_template"),
             single_file = True,
         ),
         "_deploy_template": attr.label(
-            default = Label("@bazel_tools//tools/build_rules/appengine:deploy_template"),
+            default = Label("//appengine:deploy_template"),
             single_file = True,
         ),
         "_appengine_sdk": attr.label(
@@ -290,7 +290,7 @@ def appengine_repositories():
 
   native.bind(
       name = "javax/servlet/api",
-      actual = "@bazel_tools//tools/build_rules/appengine:javax.servlet.api",
+      actual = "@bazel_tools//appengine:javax.servlet.api",
   )
 
   native.maven_jar(
