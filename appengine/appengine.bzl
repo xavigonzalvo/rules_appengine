@@ -210,11 +210,7 @@ appengine_war = rule(
             default = Label("//external:appengine/java/jars"),
         ),
         "_appengine_deps": attr.label_list(
-            default = [
-                Label("@com_google_appengine_java//:api"),
-                Label("@org_apache_commons_lang//jar"),
-                Label("@org_apache_commons_collections//jar"),
-            ],
+            default = [Label("@com_google_appengine_java//:api")],
         ),
         "jars": attr.label_list(
             allow_files = jar_filetype,
@@ -291,14 +287,4 @@ def appengine_repositories():
   native.bind(
       name = "javax/servlet/api",
       actual = "@bazel_tools//appengine:javax.servlet.api",
-  )
-
-  native.maven_jar(
-      name = "org_apache_commons_lang",
-      artifact = "commons-lang:commons-lang:2.6",
-  )
-
-  native.maven_jar(
-      name = "org_apache_commons_collections",
-      artifact = "commons-collections:commons-collections:3.2.2",
   )
