@@ -26,7 +26,7 @@ available to Bazel. The easiest way to do so is by adding the following to your
 git_repository(
     name = "io_bazel_rules_appengine",
     remote = "https://github.com/bazelbuild/rules_appengine.git",
-    tag = "0.0.1",
+    tag = "0.0.2",
 )
 load("@io_bazel_rules_appengine//appengine:appengine.bzl", "appengine_repositories")
 appengine_repositories()
@@ -62,7 +62,7 @@ java_library(
     srcs = ["java/my/webapp/TestServlet.java"],
     deps = [
         "//external:appengine/java/api",
-        "//external:javax/servlet/api",
+        "@io_bazel_rules_appengine//appengine:javax.servlet.api",
     ],
 )
 
@@ -87,7 +87,7 @@ java_war(
     data_path = "webapp",
     deps = [
         "//external:appengine/java/api",
-        "//external:javax/servlet/api",
+        "@io_bazel_rules_appengine//appengine:javax.servlet.api",
     ],
 )
 ```

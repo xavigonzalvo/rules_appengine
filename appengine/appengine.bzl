@@ -283,8 +283,3 @@ def appengine_repositories():
       name = "javax_servlet_api",
       artifact = "javax.servlet:servlet-api:2.5",
   )
-
-  native.bind(
-      name = "javax/servlet/api",
-      actual = "@bazel_tools//appengine:javax.servlet.api",
-  )
