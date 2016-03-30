@@ -243,24 +243,24 @@ java_import(
 
 java_import(
     name = "api",
-    jars = ["appengine-java-sdk-1.9.23/lib/impl/appengine-api.jar"],
+    jars = ["appengine-java-sdk-1.9.34/lib/impl/appengine-api.jar"],
     visibility = ["//visibility:public"],
     neverlink = 1,
 )
 
 filegroup(
     name = "sdk",
-    srcs = glob(["appengine-java-sdk-1.9.23/**"]),
+    srcs = glob(["appengine-java-sdk-1.9.34/**"]),
     visibility = ["//visibility:public"],
-    path = "appengine-java-sdk-1.9.23",
+    path = "appengine-java-sdk-1.9.34",
 )
 """
 
 def appengine_repositories():
   native.new_http_archive(
       name = "com_google_appengine_java",
-      url = "http://central.maven.org/maven2/com/google/appengine/appengine-java-sdk/1.9.23/appengine-java-sdk-1.9.23.zip",
-      sha256 = "05e667036e9ef4f999b829fc08f8e5395b33a5a3c30afa9919213088db2b2e89",
+      url = "http://central.maven.org/maven2/com/google/appengine/appengine-java-sdk/1.9.34/appengine-java-sdk-1.9.34.zip",
+      sha256 = "34e828bf64b48c7dc212b6cb82d67c32d42b75c988d793b97bae5fda849ce486",
       build_file_content = APPENGINE_BUILD_FILE,
   )
 
