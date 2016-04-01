@@ -15,5 +15,9 @@ filegroup(
 sh_test(
     name = "check_war",
     srcs = ["check_war.sh"],
-    data = [":test-war"],
+    data = [
+        ":test-war",
+        "@local_jdk//:jar",
+        "@local_jdk//:jdk-default",
+    ],
 )
