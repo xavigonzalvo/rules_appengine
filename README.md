@@ -53,8 +53,6 @@ application:
             appengine-web.xml
 ```
 
-### BUILD definition
-
 Then, to build your webapp, your `hello_app/BUILD` can look like:
 
 ```python
@@ -95,23 +93,16 @@ java_war(
 )
 ```
 
-You can then build the application with `bazel build //hello_app:myapp`.
-
-### Run on a local server
-
-You can run it in a development server with `bazel run //hello_app:myapp`.
-This will bind a test server on port 8080. If you wish to select another port,
+You can then build the application with `bazel build //hello_app:myapp` and
+run in it a development server with `bazel run //hello_app:myapp`. This will
+bind a test server on port 8080. If you wish to select another port,
 simply append the `--port=12345` to the command-line.
 
-### Deploy on Google app engine
-
 Another target `//hello_app:myapp.deploy` allows you to deploy your
-application to App Engine.
-
-It takes an optional argument: the `APP_ID`. If not specified, it uses the
-default `APP_ID` provided in the application. This target needs to be
-authorized to App Engine. Since Bazel does not connect the standard input,
-it is easier to run it by:
+application to App Engine. It takes an optional argument: the
+`APP_ID`. If not specified, it uses the default `APP_ID` provided in
+the application. This target needs to be authorized to App Engine. Since
+Bazel does not connect the standard input, it is easier to run it by:
 ```
 bazel-bin/hello_app/myapp.deploy APP_ID
 ```
@@ -192,7 +183,7 @@ appengine_war(name, jars, data, data_path)
 <a name="java_war"></a>
 ## java_war
 
-```python
+```
 java_war(name, data, data_path, **kwargs)
 ```
 
@@ -244,7 +235,7 @@ java_war(name, data, data_path, **kwargs)
   </tbody>
 </table>
 
-## Using a local AppEngine SDK
+# Using a local AppEngine SDK
 
 You can, optionally, specify the environment variable APPENGINE_SDK_PATH to use
 an SDK that is on your filesystem (instead of downloading a new one).
