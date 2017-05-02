@@ -276,16 +276,22 @@ APPENGINE_BUILD_FILE = """
 # BUILD file to use the Java AppEngine SDK with a remote repository.
 java_import(
     name = "jars",
-    jars = glob(["{appengine}/lib/**/*.jar"]),
+    jars = glob(["lib/**/*.jar"]),
+    visibility = ["//visibility:public"],
+)
+
+java_import(
+    name = "user",
+    jars = glob(["lib/user/*.jar"]),
     visibility = ["//visibility:public"],
 )
 
 java_import(
     name = "api",
     jars = [
-        "{appengine}/lib/agent/appengine-agent.jar",
-        "{appengine}/lib/appengine-tools-api.jar",
-        "{appengine}/lib/impl/appengine-api.jar",
+        "lib/agent/appengine-agent.jar",
+        "lib/appengine-tools-api.jar",
+        "lib/impl/appengine-api.jar",
     ],
     visibility = ["//visibility:public"],
     neverlink = 1,
@@ -293,35 +299,19 @@ java_import(
 
 filegroup(
     name = "sdk",
-    srcs = glob(["{appengine}/**"]),
+    srcs = glob(["**"]),
     visibility = ["//visibility:public"],
-    path = "{appengine}",
 )
-""".format(appengine = APPENGINE_DIR)
-
-def _find_locally_or_download_impl(repository_ctx):
-  if 'APPENGINE_SDK_PATH' in repository_ctx.os.environ:
-    path = repository_ctx.os.environ['APPENGINE_SDK_PATH']
-    if path == "":
-      fail("APPENGINE_SDK_PATH set, but empty")
-    repository_ctx.symlink(path, APPENGINE_DIR)
-  else:
-    # Due to a bug in 0.3.0, we have to create the directory before downloading
-    # the file.
-    repository_ctx.file("dummy")
-    repository_ctx.download_and_extract(
-     "http://central.maven.org/maven2/com/google/appengine/appengine-java-sdk/%s/%s.zip" % (APPENGINE_VERSION, APPENGINE_DIR),
-     ".", "f24cf8d8773cde0ce1c78a468d9a15cb824e9c99182c03216d398071f6024f8d",
-     "", "")
-  repository_ctx.file("BUILD", APPENGINE_BUILD_FILE)
-
-_find_locally_or_download = repository_rule(
-    local = False,
-    implementation = _find_locally_or_download_impl,
-)
+"""
 
 def appengine_repositories():
-  _find_locally_or_download(name = "com_google_appengine_java")
+  native.new_http_archive(
+    name = "com_google_appengine_java",
+    url = "http://central.maven.org/maven2/com/google/appengine/appengine-java-sdk/%s/%s.zip" % (APPENGINE_VERSION, APPENGINE_DIR),
+    sha256 = "f24cf8d8773cde0ce1c78a468d9a15cb824e9c99182c03216d398071f6024f8d",
+    build_file_content = APPENGINE_BUILD_FILE,
+    strip_prefix = APPENGINE_DIR,
+  )
 
   native.maven_jar(
       name = "javax_servlet_api",
