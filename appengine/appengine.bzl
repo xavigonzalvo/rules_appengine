@@ -268,7 +268,7 @@ def appengine_war(name, jars, data, data_path, testonly = 0):
   )
 
 
-APPENGINE_VERSION = "1.9.51"
+APPENGINE_VERSION = "1.9.54"
 
 APPENGINE_DIR = "appengine-java-sdk-" + APPENGINE_VERSION
 
@@ -308,7 +308,7 @@ def appengine_repositories():
   native.new_http_archive(
     name = "com_google_appengine_java",
     url = "http://central.maven.org/maven2/com/google/appengine/appengine-java-sdk/%s/%s.zip" % (APPENGINE_VERSION, APPENGINE_DIR),
-    sha256 = "f24cf8d8773cde0ce1c78a468d9a15cb824e9c99182c03216d398071f6024f8d",
+    sha256 = "79311d74886a555e135afb47395197ce5c69feb5e5557707dfd7bcddbad45e89",
     build_file_content = APPENGINE_BUILD_FILE,
     strip_prefix = APPENGINE_DIR,
   )
