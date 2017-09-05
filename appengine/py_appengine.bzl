@@ -52,9 +52,9 @@ def _find_locally_or_download_impl(repository_ctx):
     repository_ctx.symlink(path, ".")
   else:
     repository_ctx.download_and_extract(
-        url="https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.50.zip",
+        url="https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.59.zip",
         output=".",
-        sha256="06e08edbfb64c52157582625010078deedcf08130f84a2c9a81193bbebdf6afa",
+        sha256="a40a107a71d86d92366c1edbd03dc660cb09cf799b8d57b70314279efd55bea1",
         stripPrefix="google_appengine")
   repository_ctx.template("BUILD", Label("//appengine:pysdk.BUILD"))
 
@@ -87,7 +87,26 @@ def _py_appengine_binary_base_impl(ctx):
      - the script to run locally
      - the script to deploy
   """
-  symlinks = dict()
+
+  #TODO(maximermilov): add supports for custom imports
+  config = ctx.actions.declare_file("appengine_config.py")
+  ctx.actions.write(
+      output=config,
+      content="""
+import os
+import sys
+
+module_space = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'external')
+
+repo_dirs = [os.path.join(module_space, d) for d in os.listdir(module_space)]
+sys.path.extend([d for d in repo_dirs if os.path.isdir(d)])
+""",
+  )
+
+  symlinks = {
+      "appengine_config.py": config,
+  }
+
   for c in ctx.attr.configs:
     files = c.files.to_list()
     for f in files:
@@ -98,20 +117,39 @@ def _py_appengine_binary_base_impl(ctx):
       symlinks=symlinks,
   ).merge(ctx.attr.binary.data_runfiles).merge(ctx.attr.appcfg.data_runfiles)
 
-  ctx.file_action(
+  ctx.actions.write(
       output=ctx.outputs.executable,
       content="""
 #!/bin/bash
-ROOT=$PWD
-$ROOT/{0} app.yaml
-""".format(ctx.attr.devappserver.files_to_run.executable.short_path),
-      executable=True,
+
+case "$0" in
+/*) self="$0" ;;
+*)  self="$PWD/$0";;
+esac
+if [[ -e "$self.runfiles/{1}" ]]; then
+  RUNFILES="$self.runfiles/{1}"
+  cd $RUNFILES
+fi
+
+{0} app.yaml
+""".format(ctx.attr.devappserver.files_to_run.executable.short_path, ctx.workspace_name),
+      is_executable=True,
   )
 
-  ctx.file_action(
+  ctx.actions.write(
       output=ctx.outputs.deploy_sh,
       content="""
 #!/bin/bash
+
+case "$0" in
+/*) self="$0" ;;
+*)  self="$PWD/$0";;
+esac
+if [[ -e "$self.runfiles/{1}" ]]; then
+  RUNFILES="$self.runfiles/{1}"
+  cd $RUNFILES
+fi
+
 ROOT=$PWD
 tmp_dir=$(mktemp -d ${{TMPDIR:-/tmp}}/war.XXXXXXXX)
 cp -R $ROOT $tmp_dir
@@ -130,7 +168,7 @@ trap - EXIT
 
 exit $retCode
 """.format(ctx.attr.appcfg.files_to_run.executable.short_path, ctx.workspace_name),
-      executable=True,
+      is_executable=True,
   )
 
   return struct(runfiles=runfiles, py=ctx.attr.binary.py)
