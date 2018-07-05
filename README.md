@@ -35,7 +35,7 @@ git_repository(
     name = "io_bazel_rules_appengine",
     remote = "https://github.com/bazelbuild/rules_appengine.git",
     # Check https://github.com/bazelbuild/rules_appengine/releases for the latest version.
-    tag = "0.0.7",
+    tag = "0.0.8",
 )
 # Java
 load(
