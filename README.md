@@ -127,7 +127,7 @@ appengine_war(
     name = "myapp",
     jars = [":mylib"],
     data = glob(["webapp/**"]),
-    data_path = "webapp",
+    data_path = "/webapp",
 )
 ```
 
@@ -141,7 +141,7 @@ java_war(
     name = "myapp",
     srcs = ["java/my/webapp/TestServlet.java"],
     data = glob(["webapp/**"]),
-    data_path = "webapp",
+    data_path = "/webapp",
     deps = [
         "//external:appengine/java/api",
         "@io_bazel_rules_appengine//appengine:javax.servlet.api",
