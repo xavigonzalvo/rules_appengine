@@ -94,21 +94,13 @@ sys.path.extend([d for d in repo_dirs if os.path.isdir(d)])
         "appengine_config.py": config,
     }
 
+    appengine_config = None
+
     for c in ctx.attr.configs:
         files = c.files.to_list()
         for f in files:
             if f.basename == "appengine_config.py":
-                # Symlink the user-provided appengine_config file(s) to avoid name
-                # collisions and add import(s) from the custom appengine_config being
-                # created.
-                new_path = f.short_path.replace(
-                    "appengine_config",
-                    "real_appengine_config",
-                )
-                symlinks[new_path] = f
-
-                import_path = new_path.rsplit(".", 1)[0].replace("/", ".")
-                config_content += "\nimport {}\n".format(import_path)
+                appengine_config = f
             elif f.extension == "yaml":
                 # Symlink YAML config files to the top-level directory.
                 symlinks[f.basename] = f
@@ -116,10 +108,30 @@ sys.path.extend([d for d in repo_dirs if os.path.isdir(d)])
                 # Fail if any .py files were provided that were not appengine_configs.
                 fail("Invalid config file provided: " + f.short_path)
 
-    ctx.actions.write(
-        output = config,
-        content = config_content,
-    )
+    if ctx.attr.overwrite_appengine_config and appengine_config:
+        ctx.actions.run_shell(
+            inputs = [appengine_config],
+            outputs = [config],
+            command = "cp %s %s" % (appengine_config.path, config.path),
+        )
+    else:
+        if appengine_config:
+            # Symlink the user-provided appengine_config file(s) to avoid name
+            # collisions and add import(s) from the custom appengine_config being
+            # created.
+            new_path = f.short_path.replace(
+                "appengine_config",
+                "real_appengine_config",
+            )
+            symlinks[new_path] = f
+
+            import_path = new_path.rsplit(".", 1)[0].replace("/", ".")
+            config_content += "\nimport {}\n".format(import_path)
+
+        ctx.actions.write(
+            output = config,
+            content = config_content,
+        )
 
     runfiles = ctx.runfiles(
         transitive_files = ctx.attr.devappserver.data_runfiles.files,
@@ -162,6 +174,11 @@ py_appengine_binary_base = rule(
             ".yaml",
             ".py",
         ])),
+        "overwrite_appengine_config": attr.bool(
+            doc = """"If true, patch the user's appengine_config into the base one. If false, use
+                      the user specified config directly.""",
+            default = True,
+        ),
         "_deploy_template": attr.label(
             default = Label("//appengine/py:deploy_template"),
             single_file = True,
@@ -177,7 +194,7 @@ py_appengine_binary_base = rule(
     },
 )
 
-def py_appengine_binary(name, srcs, configs, deps = [], data = []):
+def py_appengine_binary(name, srcs, configs, deps = [], data = [], overwrite_appengine_config = True):
     """Convenience macro that builds the app and offers an executable
 
          target to deploy on Google app engine.
@@ -197,6 +214,7 @@ def py_appengine_binary(name, srcs, configs, deps = [], data = []):
         name = name,
         binary = ":_py_appengine_" + name,
         configs = configs,
+        overwrite_appengine_config = overwrite_appengine_config,
     )
     native.sh_binary(
         name = "%s.deploy" % name,
