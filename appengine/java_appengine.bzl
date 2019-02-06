@@ -69,6 +69,7 @@ APP_ID. If not specified, it uses the default APP_ID provided in the application
 web.xml.
 """
 
+load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 load(":variables.bzl", "JAVA_SDK_VERSION", "JAVA_SDK_SHA256")
 load(":sdk.bzl", "find_locally_or_download")
 
@@ -293,7 +294,7 @@ def java_appengine_repositories(version=JAVA_SDK_VERSION,
       strip_prefix_pattern = "appengine-java-sdk-{version}",
   )
 
-  native.maven_jar(
+  jvm_maven_import_external(
       name = "javax_servlet_api",
       artifact = "javax.servlet:servlet-api:2.5",
   )
