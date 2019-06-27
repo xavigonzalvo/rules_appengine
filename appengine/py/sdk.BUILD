@@ -27,12 +27,14 @@ py_library(
 py_binary(
     name = "dev_appserver",
     srcs = ["dev_appserver.py"],
+    python_version = "PY2",
     deps = [":appengine"],
 )
 
 py_binary(
     name = "appcfg",
     srcs = ["appcfg.py"],
+    python_version = "PY2",
     deps = [":appengine"],
 )
 
