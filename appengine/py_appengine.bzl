@@ -194,7 +194,7 @@ py_appengine_binary_base = rule(
     },
 )
 
-def py_appengine_binary(name, srcs, configs, deps = [], data = [], overwrite_appengine_config = True):
+def py_appengine_binary(name, srcs, configs, deps = [], data = [], overwrite_appengine_config = True, python_version = "PY3"):
     """Convenience macro that builds the app and offers an executable
 
          target to deploy on Google app engine.
@@ -208,6 +208,7 @@ def py_appengine_binary(name, srcs, configs, deps = [], data = [], overwrite_app
         srcs = srcs,
         deps = deps,
         data = data,
+        python_version = python_version,
         main = srcs[0],  # no entry point, use arbitrary source file
     )
     py_appengine_binary_base(
